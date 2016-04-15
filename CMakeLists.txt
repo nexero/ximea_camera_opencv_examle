@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(ximea_camera_opencv_example)
 
+FIND_PACKAGE(catkin REQUIRED)
+FIND_PACKAGE(roscpp REQUIRED)
+FIND_PACKAGE(cv_bridge REQUIRED)
+FIND_PACKAGE(image_transport REQUIRED)
+
 IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/package.xml")
     MESSAGE(FATAL_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/package.xml not found.")
 ENDIF()
@@ -19,11 +24,18 @@ ELSE()
     MESSAGE(FATAL_ERROR "OpenCV not found.")
 ENDIF()
 
+catkin_package(CATKIN_DEPENDS std_msgs
+               DEPENDS OpenCV
+               LIBRARIES ${PROJECT_NAME})
 
-include_directories(${OpenCV_INCLUDE_DIRS})
-
+include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES view_ximea_camera.cpp)
-add_executable(ximea_camera_opencv_example ${SOURCE_FILES})
+set(SOURCE_FILES src/view_ximea_camera.cpp)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES}
+                                      ${OpenCV_LIBRARIES}
+                                      ${roscpp_LIBRARIES}
+                                      ${cv_bridge_LIBRARIES}
+                                      ${image_transport_LIBRARIES})
